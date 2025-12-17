@@ -1,0 +1,85 @@
+# =========================
+# Python cache & compiled
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# =========================
+# Virtual environments
+# =========================
+venv/
+backend/venv/
+.env
+.env.*
+
+# =========================
+# IDE / Editor files
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Logs & temp files
+# =========================
+*.log
+logs/
+tmp/
+
+# =========================
+# FastAPI / Uvicorn
+# =========================
+*.pid
+
+# =========================
+# ML / AI artifacts
+# =========================
+models/
+checkpoints/
+*.h5
+*.pkl
+*.joblib
+*.pt
+*.onnx
+
+# =========================
+# Jupyter notebooks
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Testing & coverage
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+# Build & distribution
+# =========================
+build/
+dist/
+*.egg-info/
+
+# =========================
+# Database files (local)
+# =========================
+*.sqlite3
+*.db
+
+# =========================
+# Node / frontend (future)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-error.log*

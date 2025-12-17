@@ -1,0 +1,36 @@
+{
+  "lesson_id": "ICT_L1",
+  "title": "Basic concepts of ICT",
+  "learning_objectives": [
+    {
+      "lo_id": "LO1",
+      "description": "Building blocks of Information",
+      "prerequisites": []
+    },
+    {
+      "lo_id": "LO2",
+      "description": "Managing data and information with technology",
+      "prerequisites": ["LO1"]
+    },
+    {
+      "lo_id": "LO3",
+      "description": "Abstract model of information creation",
+      "prerequisites": ["LO2"]
+    },
+    {
+      "lo_id": "LO4",
+      "description": "Analyzing the activities of data processing",
+      "prerequisites": ["LO3"]
+    },
+    {
+      "lo_id": "LO5",
+      "description": "Application of ICT in different domains",
+      "prerequisites": ["LO4"]
+    },
+    {
+      "lo_id": "LO6",
+      "description": "Evaluating the impact of ICT in the society",
+      "prerequisites": ["LO5"]
+    }
+  ]
+}

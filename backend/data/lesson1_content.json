@@ -1,0 +1,14 @@
+{
+  "LO1": {
+    "text": "A computer is an electronic device that processes data to produce information.",
+    "examples": [
+      "A calculator",
+      "A smartphone",
+      "A laptop"
+    ]
+  },
+  "LO2": {
+    "text": "The input-process-output cycle explains how data is input, processed, and output.",
+    "diagram": "ipo_cycle"
+  }
+}
