@@ -1,0 +1,15 @@
+{
+    "student_id": "demo_student",
+    "lesson1": {
+        "LO1": {
+            "attempts": 2,
+            "correct": 1,
+            "mastery": 0.65
+        },
+        "LO2": {
+            "attempts": 1,
+            "correct": 1,
+            "mastery": 1.0
+        }
+    }
+}
