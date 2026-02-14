@@ -22,9 +22,9 @@ def content(lo_id: str):
 def progress():
     return get_mastery()
 
-@app.get("/lesson1/question")
-def get_question():
-    return generate_question()
+@app.get("/lesson1/question/{lo_id}")
+def get_question(lo_id: str):
+    return generate_question(lo_id)
 
 @app.post("/lesson1/answer")
 def submit_answer(payload: dict):
@@ -33,3 +33,8 @@ def submit_answer(payload: dict):
         payload["question_id"],
         payload["answer"]
     )
+
+@app.get("/lesson/{lesson_id}/next-question")
+def next_question(lesson_id: str):
+    from agents.question_agent import generate_adaptive_question
+    return generate_adaptive_question(lesson_id)

@@ -1,19 +1,17 @@
-import re
-
-def normalize(text):
-    text = text.lower()
-    text = re.sub(r"[^a-z\s]", "", text)
-    return set(text.split())
+from services.llm_service import semantic_similarity
 
 
 def evaluate_answer(student_answer, correct_answer):
-    student_tokens = normalize(student_answer)
-    correct_tokens = normalize(correct_answer)
+    student_answer = student_answer.lower().strip()
+    correct_answer = correct_answer.lower().strip()
 
-    if not correct_tokens:
-        return 0.0
+    # Rule-based score
+    rule_score = 1.0 if student_answer == correct_answer else 0.0
 
-    overlap = student_tokens.intersection(correct_tokens)
-    score = len(overlap) / len(correct_tokens)
+    # Gemini semantic score
+    semantic_score = semantic_similarity(student_answer, correct_answer)
 
-    return round(score, 2)
+    # Hybrid weighted score
+    final_score = (0.6 * semantic_score) + (0.4 * rule_score)
+
+    return round(final_score, 2)

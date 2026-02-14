@@ -1,10 +1,11 @@
 {
     "student_id": "demo_student",
+    "last_asked_lo": "LO1",
     "lesson1": {
         "LO1": {
-            "attempts": 2,
-            "correct": 1,
-            "mastery": 0.65
+            "attempts": 3,
+            "correct": 2,
+            "mastery": 0.61
         },
         "LO2": {
             "attempts": 1,
