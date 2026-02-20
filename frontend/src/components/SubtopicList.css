@@ -1,0 +1,56 @@
+.subtopic-card {
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+}
+
+.subtopic-title {
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  color: #1e293b;
+}
+
+.subtopic-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.subtopic-btn {
+  padding: 12px 20px;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.subtopic-btn:hover {
+  background: #cbd5e1;
+}
+
+.test-btn {
+  margin-top: 20px;
+  padding: 14px;
+  width: 100%;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.test-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.divider {
+  margin: 25px 0;
+  height: 1px;
+  background: #e5e7eb;
+}

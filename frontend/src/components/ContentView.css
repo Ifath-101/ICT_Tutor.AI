@@ -1,0 +1,39 @@
+.content-card {
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+}
+
+.content-title {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.content-text {
+  line-height: 1.7;
+  color: #475569;
+  margin-bottom: 30px;
+  white-space: pre-line;
+}
+
+.loading {
+  color: #64748b;
+}
+
+.knowledge-btn {
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.knowledge-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}

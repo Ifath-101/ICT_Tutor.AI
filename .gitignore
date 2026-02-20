@@ -83,3 +83,4 @@ dist/
 node_modules/
 npm-debug.log*
 yarn-error.log*
+frontend/node_modules

@@ -1,6 +1,6 @@
 {
     "student_id": "demo_student",
-    "last_asked_lo": "LO1",
+    "last_asked_lo": "LO2",
     "lesson1": {
         "LO1": {
             "attempts": 3,

@@ -6,17 +6,26 @@ from agents.evaluation_agent import evaluate_answer
 from agents.feedback_agent import generate_feedback
 from agents.progress_agent import update_mastery
 from agents.submission_agent import process_answer
+from fastapi.middleware.cors import CORSMiddleware
 import json
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
     return {"message": "AI Tutor backend running"}
 
-@app.get("/lesson1/content/{lo_id}")
-def content(lo_id: str):
-    return get_content(lo_id)
+@app.get("/lesson/{lesson_id}/content/{lo_id}")
+def content(lesson_id: str, lo_id: str):
+    return get_content(lesson_id, lo_id)
 
 @app.get("/student/progress")
 def progress():
