@@ -7,17 +7,23 @@ const API_BASE = "http://127.0.0.1:8000";
 function QuestionView({ lesson }) {
   const [question, setQuestion] = useState(null);
   const [answer, setAnswer] = useState("");
-  const [feedback, setFeedback] = useState(null);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchQuestion = () => {
+    setLoading(true);
     axios
       .get(`${API_BASE}/lesson/${lesson}/next-question`)
       .then((res) => {
         setQuestion(res.data);
         setAnswer("");
-        setFeedback(null);
+        setResult(null);
+        setLoading(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -25,23 +31,26 @@ function QuestionView({ lesson }) {
   }, []);
 
   const submitAnswer = () => {
+    if (!answer.trim()) return;
+
     axios
       .post(`${API_BASE}/lesson/${lesson}/answer`, {
         learning_objective: question.learning_objective,
-        question_id: "q1",
         answer: answer,
+        correct_answer: question.correct_answer,
       })
       .then((res) => {
-        setFeedback(res.data);
+        setResult(res.data);
       })
       .catch((err) => console.error(err));
   };
 
-  if (!question) return <p className="loading">Loading question...</p>;
+  if (loading || !question)
+    return <p className="loading">Loading question...</p>;
 
   return (
     <div className="question-card">
-      <h2 className="question-title">📝 Test Mode</h2>
+      <h2 className="question-title">📝 Adaptive Assessment</h2>
 
       <div className="question-box">
         <strong>Question:</strong>
@@ -59,13 +68,27 @@ function QuestionView({ lesson }) {
         Submit Answer
       </button>
 
-      {feedback && (
-        <div className="feedback-box">
-          <h3>Feedback</h3>
-          <p>{feedback.feedback}</p>
+      {result && (
+        <div className="result-box">
+          <h3>📊 Your Result</h3>
+
+          <p>
+            <strong>Score:</strong> {(result.score * 100).toFixed(0)}%
+          </p>
+
+          <p>
+            <strong>Updated Mastery:</strong>{" "}
+            {(result.updated_mastery * 100).toFixed(0)}%
+          </p>
+
+          <div className="feedback-section">
+            <p><strong>Explanation:</strong> {result.explanation}</p>
+            <p><strong>Strengths:</strong> {result.strengths}</p>
+            <p><strong>Improvements:</strong> {result.improvements}</p>
+          </div>
 
           <button className="next-btn" onClick={fetchQuestion}>
-            Next Question
+            ➡ Next Question
           </button>
         </div>
       )}

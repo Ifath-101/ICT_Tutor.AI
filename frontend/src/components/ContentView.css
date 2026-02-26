@@ -1,39 +1,107 @@
 .content-card {
   background: white;
-  padding: 30px;
-  border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  margin-bottom: 40px;
 }
 
 .content-title {
-  font-size: 1.6rem;
-  margin-bottom: 20px;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
   color: #1e293b;
 }
 
-.content-text {
-  line-height: 1.7;
-  color: #475569;
-  margin-bottom: 30px;
-  white-space: pre-line;
+/* Markdown Styling */
+.markdown-content {
+  line-height: 1.8;
+  color: #334155;
+  font-size: 1rem;
 }
 
+/* Headings */
+.markdown-content h1 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #1e293b;
+}
+
+.markdown-content h2 {
+  font-size: 1.5rem;
+  margin-top: 25px;
+  margin-bottom: 12px;
+  color: #1e40af;
+}
+
+.markdown-content h3 {
+  font-size: 1.3rem;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #2563eb;
+}
+
+/* Paragraph spacing */
+.markdown-content p {
+  margin-bottom: 15px;
+}
+
+/* Lists */
+.markdown-content ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.markdown-content li {
+  margin-bottom: 8px;
+}
+
+/* Horizontal rule */
+.markdown-content hr {
+  border: none;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 25px 0;
+}
+
+/* Bold text */
+.markdown-content strong {
+  color: #0f172a;
+}
+
+/* Loading */
 .loading {
+  font-style: italic;
   color: #64748b;
 }
 
+/* Button area */
+.content-actions {
+  margin-top: 30px;
+}
+
 .knowledge-btn {
-  padding: 14px 20px;
+  padding: 14px 22px;
   background: linear-gradient(135deg, #2563eb, #1e40af);
   color: white;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: 0.3s ease;
+  font-size: 1rem;
 }
 
 .knowledge-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-card {
+    padding: 20px;
+  }
+
+  .content-title {
+    font-size: 1.5rem;
+  }
 }

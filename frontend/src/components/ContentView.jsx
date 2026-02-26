@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
 import "./ContentView.css";
 
 const API_BASE = "http://127.0.0.1:8000";
 
-function ContentView({ lesson, subtopic, onCheckKnowledge }) {
+function ContentView({ lesson, subtopic, onStartTest }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -28,17 +29,18 @@ function ContentView({ lesson, subtopic, onCheckKnowledge }) {
       <h2 className="content-title">📖 Study Content</h2>
 
       {loading ? (
-        <p className="loading">Generating lesson content...</p>
+        <div className="loading">Generating lesson content...</div>
       ) : (
-        <p className="content-text">{content}</p>
+        <div className="markdown-content">
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
       )}
 
-      <button
-        className="knowledge-btn"
-        onClick={onCheckKnowledge}
-      >
-        Check Knowledge
-      </button>
+      <div className="content-actions">
+        <button className="knowledge-btn" onClick={onStartTest}>
+          🚀 Start Assessment
+        </button>
+      </div>
     </div>
   );
 }

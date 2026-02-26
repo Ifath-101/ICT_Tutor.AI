@@ -1,31 +1,31 @@
 import "./SubtopicList.css";
 
-function SubtopicList({ lesson, onSelectSubtopic, onTestMode }) {
+function SubtopicList({ lesson, onSelectSubtopic, onDirectTest }) {
   return (
     <div className="subtopic-card">
       <h2 className="subtopic-title">Choose a Subtopic</h2>
 
-      <div className="subtopic-buttons">
-        <button
-          className="subtopic-btn"
-          onClick={() => onSelectSubtopic("LO1")}
-        >
-          LO1
-        </button>
+      {["LO1", "LO2"].map((lo) => (
+        <div key={lo} className="subtopic-row">
+          <h3>{lo}</h3>
 
-        <button
-          className="subtopic-btn"
-          onClick={() => onSelectSubtopic("LO2")}
-        >
-          LO2
-        </button>
-      </div>
+          <div className="subtopic-actions">
+            <button
+              className="study-btn"
+              onClick={() => onSelectSubtopic(lo)}
+            >
+              📖 Study Content
+            </button>
 
-      <div className="divider"></div>
-
-      <button className="test-btn" onClick={onTestMode}>
-        🚀 Take Adaptive Test Directly
-      </button>
+            <button
+              className="test-btn"
+              onClick={() => onDirectTest(lo)}
+            >
+              📝 Try Assessment
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

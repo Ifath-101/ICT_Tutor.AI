@@ -8,22 +8,45 @@ import QuestionView from "./components/QuestionView";
 function App() {
   const [lesson, setLesson] = useState(null);
   const [subtopic, setSubtopic] = useState(null);
-  const [mode, setMode] = useState("lesson");
+  const [mode, setMode] = useState("lesson"); 
+  // lesson | subtopics | content | test
+
+  const resetAll = () => {
+    setLesson(null);
+    setSubtopic(null);
+    setMode("lesson");
+  };
 
   return (
     <div className="app-container">
       <h1 className="app-title">ICT Tutor AI</h1>
 
-      {!lesson && <LessonList onSelectLesson={setLesson} />}
+      {lesson && (
+        <button className="back-btn" onClick={resetAll}>
+          ⬅ Back to Lessons
+        </button>
+      )}
 
-      {lesson && !subtopic && mode === "lesson" && (
+      {!lesson && (
+        <LessonList
+          onSelectLesson={(l) => {
+            setLesson(l);
+            setMode("subtopics");
+          }}
+        />
+      )}
+
+      {lesson && mode === "subtopics" && (
         <SubtopicList
           lesson={lesson}
           onSelectSubtopic={(lo) => {
             setSubtopic(lo);
             setMode("content");
           }}
-          onTestMode={() => setMode("test")}
+          onDirectTest={(lo) => {
+            setSubtopic(lo);
+            setMode("test");
+          }}
         />
       )}
 
@@ -31,11 +54,11 @@ function App() {
         <ContentView
           lesson={lesson}
           subtopic={subtopic}
-          onCheckKnowledge={() => setMode("test")}
+          onStartTest={() => setMode("test")}
         />
       )}
 
-      {lesson && mode === "test" && (
+      {lesson && subtopic && mode === "test" && (
         <QuestionView lesson={lesson} />
       )}
     </div>
