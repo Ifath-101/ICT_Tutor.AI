@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database.database import engine
+from database import models
 import json
 from pathlib import Path
 
 from agents.content_agent import get_content
 from agents.question_agent import generate_question
 from agents.submission_agent import process_answer
+
+models.Base.metadata.create_all(bind=engine)
 
 BASE_DIR = Path(__file__).resolve().parent
 BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
