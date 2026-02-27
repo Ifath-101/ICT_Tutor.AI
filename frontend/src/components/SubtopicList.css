@@ -1,56 +1,56 @@
 .subtopic-card {
   background: white;
-  padding: 30px;
-  border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
+  padding: 40px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .subtopic-title {
-  font-size: 1.5rem;
+  text-align: center;
   margin-bottom: 25px;
-  color: #1e293b;
+  font-size: 22px;
 }
 
-.subtopic-buttons {
+.subtopic-row {
+  margin-bottom: 25px;
+}
+
+.subtopic-row h3 {
+  margin-bottom: 10px;
+  color: #334155;
+}
+
+.subtopic-actions {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.subtopic-btn {
-  padding: 12px 20px;
-  background: #e2e8f0;
-  border: none;
+.study-btn,
+.test-btn {
+  flex: 1;
+  padding: 10px;
   border-radius: 10px;
+  border: none;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: 0.2s;
 }
 
-.subtopic-btn:hover {
-  background: #cbd5e1;
+.study-btn {
+  background: #e0e7ff;
+}
+
+.study-btn:hover {
+  background: #c7d2fe;
 }
 
 .test-btn {
-  margin-top: 20px;
-  padding: 14px;
-  width: 100%;
-  background: linear-gradient(135deg, #10b981, #047857);
+  background: #4f46e5;
   color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.3s ease;
 }
 
 .test-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-}
-
-.divider {
-  margin: 25px 0;
-  height: 1px;
-  background: #e5e7eb;
+  background: #4338ca;
 }

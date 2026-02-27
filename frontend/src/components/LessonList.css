@@ -1,40 +1,30 @@
 .lesson-card {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
   text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .lesson-title {
-  font-size: 1.6rem;
-  margin-bottom: 25px;
-  color: #1e293b;
+  font-size: 22px;
+  margin-bottom: 20px;
 }
 
 .lesson-btn {
-  padding: 14px 22px;
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  color: white;
-  border: none;
+  padding: 14px 20px;
   border-radius: 12px;
-  font-size: 1rem;
+  border: none;
+  width: 100%;
+  background: #4f46e5;
+  color: white;
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s;
 }
 
 .lesson-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-}
-
-@media (max-width: 768px) {
-  .lesson-card {
-    padding: 20px;
-  }
-
-  .lesson-btn {
-    width: 100%;
-  }
+  background: #4338ca;
 }

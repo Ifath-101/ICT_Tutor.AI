@@ -3,9 +3,9 @@
     "last_asked_lo": "LO1",
     "lesson1": {
         "LO1": {
-            "attempts": 4,
+            "attempts": 5,
             "correct": 2,
-            "mastery": 0.5
+            "mastery": 0.38
         },
         "LO2": {
             "attempts": 1,
