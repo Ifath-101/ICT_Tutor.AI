@@ -26,24 +26,23 @@ def generate_question(lesson_id):
         difficulty = "application-level"
 
     prompt = f"""
-    Create ONE {difficulty} question strictly based on:
+    You are an AI tutor.
 
-    Lesson Scope:
-    {blueprint["scope"]}
+    Generate EXACTLY ONE {difficulty} question.
 
-    Learning Objective:
-    {lo["objective"]}
+    IMPORTANT RULES:
+    - Generate ONLY ONE question.
+    - Do NOT combine multiple questions.
+    - Question must test ONLY this objective:
+      {lo["objective"]}
+    - Stay strictly within this scope:
+      {blueprint["scope"]}
 
-    Ensure:
-    - Question directly tests this objective
-    - No unrelated topics
-    - Provide correct_answer
-
-    Return ONLY JSON:
+    Return ONLY valid JSON:
     {{
         "learning_objective": "{lo_id}",
-        "question": "...",
-        "correct_answer": "..."
+        "question": "One clear question only.",
+        "correct_answer": "Clear model answer."
     }}
     """
 

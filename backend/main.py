@@ -1,8 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import json
+from pathlib import Path
+
 from agents.content_agent import get_content
 from agents.question_agent import generate_question
 from agents.submission_agent import process_answer
+
+BASE_DIR = Path(__file__).resolve().parent
+BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
 
 app = FastAPI()
 
@@ -17,6 +23,13 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"message": "AI Tutor backend running"}
+
+
+# 🔥 NEW ENDPOINT
+@app.get("/lesson/{lesson_id}/blueprint")
+def get_blueprint(lesson_id: str):
+    with open(BLUEPRINT_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 @app.get("/lesson/{lesson_id}/content/{lo_id}")
