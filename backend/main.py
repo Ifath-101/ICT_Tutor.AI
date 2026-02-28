@@ -4,7 +4,7 @@ from database.database import engine
 from database import models
 import json
 from pathlib import Path
-
+from routes.auth_routes import router as auth_router
 from agents.content_agent import get_content
 from agents.question_agent import generate_question
 from agents.submission_agent import process_answer
@@ -15,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent
 BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
 
 app = FastAPI()
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
