@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -7,19 +7,15 @@ from auth.dependencies import get_current_user
 from database import models
 from database.database import engine, get_db
 from database.models import User
-import json
-from pathlib import Path
 from routes.auth_routes import router as auth_router
 from agents.content_agent import get_content
 from agents.question_agent import generate_question
 from agents.submission_agent import process_answer
+from lessons.catalog import list_lessons, load_blueprint
 from routes.progress_routes import router as progress_router
 from routes.tutor_routes import router as tutor_router
 
 models.Base.metadata.create_all(bind=engine)
-
-BASE_DIR = Path(__file__).resolve().parent
-BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
 
 app = FastAPI()
 app.include_router(auth_router)
@@ -39,7 +35,11 @@ def home():
     return {"message": "AI Tutor backend running"}
 
 
-# 🔥 NEW ENDPOINT
+@app.get("/lessons")
+def get_lessons():
+    return list_lessons()
+
+
 class AnswerPayload(BaseModel):
     learning_objective: str
     answer: str
@@ -51,11 +51,7 @@ def get_blueprint(
     lesson_id: str,
     current_user: User = Depends(get_current_user),
 ):
-    with open(BLUEPRINT_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    if lesson_id != data.get("lesson_id", "lesson1"):
-        raise HTTPException(status_code=404, detail="Lesson not found")
-    return data
+    return load_blueprint(lesson_id)
 
 
 @app.get("/lesson/{lesson_id}/content/{lo_id}")

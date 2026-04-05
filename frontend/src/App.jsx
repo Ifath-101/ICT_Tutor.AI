@@ -1,9 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import LoginForm from "./components/LoginForm";
 import MainLayout from "./components/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import LearnLessonSelectPage from "./pages/LearnLessonSelectPage";
 import LearnSubtopicsPage from "./pages/LearnSubtopicsPage";
@@ -13,7 +15,7 @@ import AssessmentLessonSelectPage from "./pages/AssessmentLessonSelectPage";
 import AssessmentRunPage from "./pages/AssessmentRunPage";
 
 function App() {
-  const { user, ready } = useAuth();
+  const { ready } = useAuth();
 
   if (!ready) {
     return (
@@ -23,35 +25,34 @@ function App() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="app-wrapper app-center">
-        <LoginForm />
-      </div>
-    );
-  }
-
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/learn" element={<LearnLessonSelectPage />} />
-          <Route path="/learn/:lessonId" element={<LearnSubtopicsPage />} />
-          <Route
-            path="/learn/:lessonId/study/:loId"
-            element={<LearnStudyPage />}
-          />
-          <Route path="/learn/:lessonId/assess" element={<LearnAssessPage />} />
-          <Route
-            path="/assessments"
-            element={<AssessmentLessonSelectPage />}
-          />
-          <Route
-            path="/assessments/:lessonId"
-            element={<AssessmentRunPage />}
-          />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/learn" element={<LearnLessonSelectPage />} />
+            <Route path="/learn/:lessonId" element={<LearnSubtopicsPage />} />
+            <Route
+              path="/learn/:lessonId/study/:loId"
+              element={<LearnStudyPage />}
+            />
+            <Route
+              path="/learn/:lessonId/assess"
+              element={<LearnAssessPage />}
+            />
+            <Route
+              path="/assessments"
+              element={<AssessmentLessonSelectPage />}
+            />
+            <Route
+              path="/assessments/:lessonId"
+              element={<AssessmentRunPage />}
+            />
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

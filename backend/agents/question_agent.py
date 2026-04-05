@@ -1,23 +1,16 @@
 import json
 import re
-from pathlib import Path
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from agents.progress_agent import get_adaptive_lo, get_lo_mastery
+from lessons.catalog import load_blueprint
 from services.llm_service import client, MODEL_NAME
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
 
 
 def generate_question(lesson_id: str, db: Session, user_id: int):
-    with open(BLUEPRINT_PATH, "r", encoding="utf-8") as f:
-        blueprint = json.load(f)
-
-    if lesson_id != blueprint.get("lesson_id", "lesson1"):
-        raise HTTPException(status_code=404, detail="Lesson not found")
+    blueprint = load_blueprint(lesson_id)
 
     lo_ids = list(blueprint["learning_objectives"].keys())
     lo_id = get_adaptive_lo(db, user_id, lesson_id, lo_ids)

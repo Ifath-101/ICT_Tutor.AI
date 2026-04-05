@@ -1,21 +1,11 @@
-import json
-from pathlib import Path
+from lessons.catalog import load_blueprint
 from services.llm_service import client, MODEL_NAME
 from fastapi import HTTPException
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
 
 
 def get_content(lesson_id: str, lo_id: str):
     try:
-        # Load blueprint
-        with open(BLUEPRINT_PATH, "r", encoding="utf-8") as f:
-            blueprint = json.load(f)
-
-        # Validate lesson_id (optional if only one lesson for now)
-        if lesson_id != blueprint.get("lesson_id", "lesson1"):
-            raise HTTPException(status_code=404, detail="Lesson not found")
+        blueprint = load_blueprint(lesson_id)
 
         # Validate LO existence
         learning_objectives = blueprint.get("learning_objectives", {})
@@ -57,8 +47,7 @@ def get_content(lesson_id: str, lo_id: str):
             "content": response.text
         }
 
-    except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="Blueprint file not found")
-
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

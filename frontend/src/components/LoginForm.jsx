@@ -1,25 +1,33 @@
 import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./LoginForm.css";
 
-function LoginForm() {
+/** @param {{ variant: "login" | "register" }} props */
+function LoginForm({ variant }) {
   const { login, register } = useAuth();
-  const [mode, setMode] = useState("login");
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const from = location.state?.from
+    ? `${location.state.from.pathname}${location.state.from.search || ""}`
+    : "/";
 
   const submit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      if (mode === "login") {
+      if (variant === "login") {
         await login(email.trim(), password);
       } else {
         await register(email.trim(), password);
       }
+      navigate(from, { replace: true });
     } catch (err) {
       const msg =
         err.response?.data?.detail ??
@@ -35,7 +43,7 @@ function LoginForm() {
   return (
     <div className="auth-card">
       <h2 className="auth-title">
-        {mode === "login" ? "Sign in" : "Create account"}
+        {variant === "login" ? "Sign in" : "Create account"}
       </h2>
       <p className="auth-sub">
         Your progress and adaptive practice are saved to your account.
@@ -63,7 +71,7 @@ function LoginForm() {
             required
             minLength={6}
             autoComplete={
-              mode === "login" ? "current-password" : "new-password"
+              variant === "login" ? "current-password" : "new-password"
             }
           />
         </label>
@@ -71,22 +79,37 @@ function LoginForm() {
         {error && <div className="auth-error">{error}</div>}
 
         <button type="submit" className="auth-submit" disabled={loading}>
-          {loading ? "Please wait…" : mode === "login" ? "Sign in" : "Register"}
+          {loading
+            ? "Please wait…"
+            : variant === "login"
+              ? "Sign in"
+              : "Register"}
         </button>
       </form>
 
-      <button
-        type="button"
-        className="auth-switch"
-        onClick={() => {
-          setMode(mode === "login" ? "register" : "login");
-          setError("");
-        }}
-      >
-        {mode === "login"
-          ? "Need an account? Register"
-          : "Already have an account? Sign in"}
-      </button>
+      {variant === "login" ? (
+        <p className="auth-footer-text">
+          Need an account?{" "}
+          <Link
+            to="/register"
+            state={location.state}
+            className="auth-inline-link"
+          >
+            Register
+          </Link>
+        </p>
+      ) : (
+        <p className="auth-footer-text">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            state={location.state}
+            className="auth-inline-link"
+          >
+            Sign in
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

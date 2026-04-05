@@ -76,18 +76,3 @@
   cursor: not-allowed;
 }
 
-.auth-switch {
-  margin-top: 20px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  background: none;
-  color: #4f46e5;
-  font-size: 14px;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.auth-switch:hover {
-  color: #4338ca;
-}
