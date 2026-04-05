@@ -1,23 +1,19 @@
-import { useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import LessonList from "./components/LessonList";
-import SubtopicList from "./components/SubtopicList";
-import ContentView from "./components/ContentView";
-import QuestionView from "./components/QuestionView";
 import LoginForm from "./components/LoginForm";
+import MainLayout from "./components/MainLayout";
 import { useAuth } from "./context/AuthContext";
+import HomePage from "./pages/HomePage";
+import DashboardPage from "./pages/DashboardPage";
+import LearnLessonSelectPage from "./pages/LearnLessonSelectPage";
+import LearnSubtopicsPage from "./pages/LearnSubtopicsPage";
+import LearnStudyPage from "./pages/LearnStudyPage";
+import LearnAssessPage from "./pages/LearnAssessPage";
+import AssessmentLessonSelectPage from "./pages/AssessmentLessonSelectPage";
+import AssessmentRunPage from "./pages/AssessmentRunPage";
 
 function App() {
-  const { user, ready, logout } = useAuth();
-  const [lesson, setLesson] = useState(null);
-  const [subtopic, setSubtopic] = useState(null);
-  const [mode, setMode] = useState("lesson");
-
-  const resetAll = () => {
-    setLesson(null);
-    setSubtopic(null);
-    setMode("lesson");
-  };
+  const { user, ready } = useAuth();
 
   if (!ready) {
     return (
@@ -36,61 +32,30 @@ function App() {
   }
 
   return (
-    <div className="app-wrapper">
-      <header className="app-header">
-        <div className="header-brand">
-          <h1>ICT Tutor AI</h1>
-          <span className="user-email">{user.email}</span>
-        </div>
-        <div className="header-actions">
-          {lesson && (
-            <button className="back-btn" onClick={resetAll}>
-              ⬅ Back
-            </button>
-          )}
-          <button className="logout-btn" type="button" onClick={logout}>
-            Log out
-          </button>
-        </div>
-      </header>
-
-      <main className="app-content">
-        {!lesson && (
-          <LessonList
-            onSelectLesson={(l) => {
-              setLesson(l);
-              setMode("subtopics");
-            }}
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/learn" element={<LearnLessonSelectPage />} />
+          <Route path="/learn/:lessonId" element={<LearnSubtopicsPage />} />
+          <Route
+            path="/learn/:lessonId/study/:loId"
+            element={<LearnStudyPage />}
           />
-        )}
-
-        {lesson && mode === "subtopics" && (
-          <SubtopicList
-            lesson={lesson}
-            onSelectSubtopic={(lo) => {
-              setSubtopic(lo);
-              setMode("content");
-            }}
-            onDirectTest={(lo) => {
-              setSubtopic(lo);
-              setMode("test");
-            }}
+          <Route path="/learn/:lessonId/assess" element={<LearnAssessPage />} />
+          <Route
+            path="/assessments"
+            element={<AssessmentLessonSelectPage />}
           />
-        )}
-
-        {lesson && subtopic && mode === "content" && (
-          <ContentView
-            lesson={lesson}
-            subtopic={subtopic}
-            onStartTest={() => setMode("test")}
+          <Route
+            path="/assessments/:lessonId"
+            element={<AssessmentRunPage />}
           />
-        )}
-
-        {lesson && subtopic && mode === "test" && (
-          <QuestionView lesson={lesson} />
-        )}
-      </main>
-    </div>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

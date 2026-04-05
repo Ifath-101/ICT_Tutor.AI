@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { api } from "../api/client";
 import "./QuestionView.css";
 
-function QuestionView({ lesson }) {
+function QuestionView({ lesson: lessonProp }) {
+  const { lessonId } = useParams();
+  const lesson = lessonProp ?? lessonId;
+
   const [question, setQuestion] = useState(null);
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState(null);
 
-  const fetchQuestion = () => {
+  const fetchQuestion = useCallback(() => {
+    if (!lesson) return;
     api
       .get(`/lesson/${lesson}/next-question`)
       .then((res) => {
@@ -16,14 +21,16 @@ function QuestionView({ lesson }) {
         setResult(null);
       })
       .catch((err) => console.error(err));
-  };
-
-  useEffect(() => {
-    fetchQuestion();
   }, [lesson]);
 
+  useEffect(() => {
+    setQuestion(null);
+    setResult(null);
+    fetchQuestion();
+  }, [lesson, fetchQuestion]);
+
   const submitAnswer = () => {
-    if (!answer.trim()) return;
+    if (!answer.trim() || !question) return;
 
     api
       .post(`/lesson/${lesson}/answer`, {
@@ -36,6 +43,10 @@ function QuestionView({ lesson }) {
       })
       .catch((err) => console.error(err));
   };
+
+  if (!lesson) {
+    return <div className="loading">Missing lesson.</div>;
+  }
 
   if (!question) return <div className="loading">Loading question...</div>;
 
@@ -54,19 +65,30 @@ function QuestionView({ lesson }) {
         placeholder="Type your answer..."
       />
 
-      <button className="submit-btn" onClick={submitAnswer}>
+      <button type="button" className="submit-btn" onClick={submitAnswer}>
         Submit Answer
       </button>
 
       {result && (
         <div className="result-box">
-          <p><strong>Score:</strong> {(result.score * 100).toFixed(0)}%</p>
-          <p><strong>Mastery:</strong> {(result.updated_mastery * 100).toFixed(0)}%</p>
-          <p><strong>Explanation:</strong> {result.explanation}</p>
-          <p><strong>Strengths:</strong> {result.strengths}</p>
-          <p><strong>Improvements:</strong> {result.improvements}</p>
+          <p>
+            <strong>Score:</strong> {(result.score * 100).toFixed(0)}%
+          </p>
+          <p>
+            <strong>Mastery:</strong>{" "}
+            {(result.updated_mastery * 100).toFixed(0)}%
+          </p>
+          <p>
+            <strong>Explanation:</strong> {result.explanation}
+          </p>
+          <p>
+            <strong>Strengths:</strong> {result.strengths}
+          </p>
+          <p>
+            <strong>Improvements:</strong> {result.improvements}
+          </p>
 
-          <button className="next-btn" onClick={fetchQuestion}>
+          <button type="button" className="next-btn" onClick={fetchQuestion}>
             Next Question
           </button>
         </div>

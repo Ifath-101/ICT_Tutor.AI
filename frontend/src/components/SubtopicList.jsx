@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import "./SubtopicList.css";
 
-function SubtopicList({ lesson, onSelectSubtopic, onDirectTest }) {
+/** mode: "full" | "learn" | "assessment" */
+function SubtopicList({
+  lesson,
+  mode = "full",
+  onSelectSubtopic,
+  onDirectTest,
+}) {
   const [objectives, setObjectives] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -18,6 +24,9 @@ function SubtopicList({ lesson, onSelectSubtopic, onDirectTest }) {
 
   if (loading) return <div className="loading">Loading subtopics...</div>;
 
+  const showStudy = mode === "full" || mode === "learn";
+  const showAssessment = mode === "full" || mode === "assessment";
+
   return (
     <div className="subtopic-card">
       <h2 className="subtopic-title">Choose a Subtopic</h2>
@@ -28,19 +37,23 @@ function SubtopicList({ lesson, onSelectSubtopic, onDirectTest }) {
           <p className="objective-text">{loValue.objective}</p>
 
           <div className="subtopic-actions">
-            <button
-              className="study-btn"
-              onClick={() => onSelectSubtopic(loKey)}
-            >
-              📖 Study Content
-            </button>
+            {showStudy && (
+              <button
+                className="study-btn"
+                onClick={() => onSelectSubtopic(loKey)}
+              >
+                📖 Study Content
+              </button>
+            )}
 
-            <button
-              className="test-btn"
-              onClick={() => onDirectTest(loKey)}
-            >
-              📝 Try Assessment
-            </button>
+            {showAssessment && onDirectTest && (
+              <button
+                className="test-btn"
+                onClick={() => onDirectTest(loKey)}
+              >
+                📝 Start assessment
+              </button>
+            )}
           </div>
         </div>
       ))}
