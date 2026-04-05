@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import ReactMarkdown from "react-markdown";
+import { api } from "../api/client";
 import "./ContentView.css";
-
-const API_BASE = "http://127.0.0.1:8000";
 
 function ContentView({ lesson, subtopic, onStartTest }) {
   const [content, setContent] = useState("");
@@ -12,8 +10,8 @@ function ContentView({ lesson, subtopic, onStartTest }) {
   useEffect(() => {
     setLoading(true);
 
-    axios
-      .get(`${API_BASE}/lesson/${lesson}/content/${subtopic}`)
+    api
+      .get(`/lesson/${lesson}/content/${subtopic}`)
       .then((res) => {
         setContent(res.data.content);
         setLoading(false);

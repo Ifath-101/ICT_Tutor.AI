@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../api/client";
 import "./SubtopicList.css";
-
-const API_BASE = "http://127.0.0.1:8000";
 
 function SubtopicList({ lesson, onSelectSubtopic, onDirectTest }) {
   const [objectives, setObjectives] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE}/lesson/${lesson}/blueprint`)
+    api
+      .get(`/lesson/${lesson}/blueprint`)
       .then((res) => {
         setObjectives(res.data.learning_objectives);
         setLoading(false);

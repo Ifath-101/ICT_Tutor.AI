@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../api/client";
 import "./QuestionView.css";
-
-const API_BASE = "http://127.0.0.1:8000";
 
 function QuestionView({ lesson }) {
   const [question, setQuestion] = useState(null);
@@ -10,8 +8,8 @@ function QuestionView({ lesson }) {
   const [result, setResult] = useState(null);
 
   const fetchQuestion = () => {
-    axios
-      .get(`${API_BASE}/lesson/${lesson}/next-question`)
+    api
+      .get(`/lesson/${lesson}/next-question`)
       .then((res) => {
         setQuestion(res.data);
         setAnswer("");
@@ -22,13 +20,13 @@ function QuestionView({ lesson }) {
 
   useEffect(() => {
     fetchQuestion();
-  }, []);
+  }, [lesson]);
 
   const submitAnswer = () => {
     if (!answer.trim()) return;
 
-    axios
-      .post(`${API_BASE}/lesson/${lesson}/answer`, {
+    api
+      .post(`/lesson/${lesson}/answer`, {
         learning_objective: question.learning_objective,
         answer: answer,
         correct_answer: question.correct_answer,

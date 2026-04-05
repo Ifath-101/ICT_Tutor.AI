@@ -1,28 +1,30 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
+from auth.dependencies import get_current_user
+from auth.security import create_access_token, hash_password, verify_password
 from database.database import get_db
 from database.models import User
-from auth.security import hash_password
-from auth.security import verify_password, create_access_token
-from auth.dependencies import get_current_user
 
 router = APIRouter()
 
 
-@router.post("/register")
-def register(email: str, password: str, db: Session = Depends(get_db)):
+class AuthBody(BaseModel):
+    email: str
+    password: str
 
-    # Check if user exists
-    existing_user = db.query(User).filter(User.email == email).first()
+
+@router.post("/register")
+def register(body: AuthBody, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == body.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Hash password
-    hashed_pw = hash_password(password)
+    hashed_pw = hash_password(body.password)
 
-    # Create user
     new_user = User(
-        email=email,
+        email=body.email,
         password_hash=hashed_pw
     )
 
@@ -32,15 +34,15 @@ def register(email: str, password: str, db: Session = Depends(get_db)):
 
     return {"message": "User registered successfully"}
 
-@router.post("/login")
-def login(email: str, password: str, db: Session = Depends(get_db)):
 
-    user = db.query(User).filter(User.email == email).first()
+@router.post("/login")
+def login(body: AuthBody, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == body.email).first()
 
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    if not verify_password(password, user.password_hash):
+    if not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token({"sub": user.email})

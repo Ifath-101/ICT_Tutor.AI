@@ -1,22 +1,29 @@
 import json
 import re
 from pathlib import Path
+
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+
+from agents.progress_agent import get_adaptive_lo, get_lo_mastery
 from services.llm_service import client, MODEL_NAME
-from agents.progress_agent import get_adaptive_lo, get_mastery
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 BLUEPRINT_PATH = BASE_DIR / "data" / "lesson1_blueprint.json"
 
 
-def generate_question(lesson_id):
+def generate_question(lesson_id: str, db: Session, user_id: int):
     with open(BLUEPRINT_PATH, "r", encoding="utf-8") as f:
         blueprint = json.load(f)
 
-    lo_id = get_adaptive_lo(lesson_id)
+    if lesson_id != blueprint.get("lesson_id", "lesson1"):
+        raise HTTPException(status_code=404, detail="Lesson not found")
+
+    lo_ids = list(blueprint["learning_objectives"].keys())
+    lo_id = get_adaptive_lo(db, user_id, lesson_id, lo_ids)
     lo = blueprint["learning_objectives"][lo_id]
 
-    progress = get_mastery()
-    mastery = progress[lesson_id][lo_id]["mastery"]
+    mastery = get_lo_mastery(db, user_id, lesson_id, lo_id)
 
     if mastery < 0.4:
         difficulty = "easy"

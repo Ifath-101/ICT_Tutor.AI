@@ -1,50 +1,70 @@
-import json
-from pathlib import Path
+from sqlalchemy.orm import Session
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-PROGRESS_PATH = BASE_DIR / "data" / "student_progress.json"
+from database.models import Progress
 
 
-def get_mastery():
-    with open(PROGRESS_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def update_mastery(lesson_id, lo_id, score):
-    with open(PROGRESS_PATH, "r", encoding="utf-8") as f:
-        progress = json.load(f)
-
-    lo_data = progress[lesson_id][lo_id]
-
-    lo_data["attempts"] += 1
-    if score >= 0.6:
-        lo_data["correct"] += 1
-
-    current = lo_data["mastery"]
-
-    # Reinforcement update (Weighted moving average)
-    new_mastery = round((current * 0.7) + (score * 0.3), 2)
-
-    lo_data["mastery"] = new_mastery
-    progress["last_asked_lo"] = lo_id
-
-    with open(PROGRESS_PATH, "w", encoding="utf-8") as f:
-        json.dump(progress, f, indent=4)
-
-    return new_mastery
-
-
-def get_adaptive_lo(lesson_id):
-    with open(PROGRESS_PATH, "r", encoding="utf-8") as f:
-        progress = json.load(f)
-
-    lesson_progress = progress[lesson_id]
-
-    sorted_los = sorted(
-        lesson_progress.items(),
-        key=lambda x: x[1]["mastery"]
+def get_or_create_progress(
+    db: Session, user_id: int, lesson_id: str, lo_id: str
+) -> Progress:
+    p = (
+        db.query(Progress)
+        .filter(
+            Progress.user_id == user_id,
+            Progress.lesson_id == lesson_id,
+            Progress.lo_id == lo_id,
+        )
+        .first()
     )
+    if not p:
+        p = Progress(
+            user_id=user_id,
+            lesson_id=lesson_id,
+            lo_id=lo_id,
+            mastery=0.0,
+            attempts=0,
+            correct=0,
+        )
+        db.add(p)
+        db.flush()
+    return p
 
-    return sorted_los[0][0]
+
+def get_lo_mastery(db: Session, user_id: int, lesson_id: str, lo_id: str) -> float:
+    p = (
+        db.query(Progress)
+        .filter(
+            Progress.user_id == user_id,
+            Progress.lesson_id == lesson_id,
+            Progress.lo_id == lo_id,
+        )
+        .first()
+    )
+    return p.mastery if p else 0.0
 
 
+def get_adaptive_lo(
+    db: Session, user_id: int, lesson_id: str, lo_ids: list[str]
+) -> str:
+    weakest = None
+    lowest = float("inf")
+    for lo_id in lo_ids:
+        m = get_lo_mastery(db, user_id, lesson_id, lo_id)
+        if m < lowest:
+            lowest = m
+            weakest = lo_id
+    return weakest or lo_ids[0]
+
+
+def update_mastery(
+    db: Session, user_id: int, lesson_id: str, lo_id: str, score: float
+) -> float:
+    p = get_or_create_progress(db, user_id, lesson_id, lo_id)
+    p.attempts += 1
+    if score >= 0.6:
+        p.correct += 1
+
+    new_mastery = round((p.mastery * 0.7) + (score * 0.3), 2)
+    p.mastery = new_mastery
+    db.commit()
+    db.refresh(p)
+    return new_mastery
