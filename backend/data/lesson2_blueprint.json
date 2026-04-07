@@ -1,0 +1,24 @@
+{
+  "lesson_id": "lesson2",
+  "title": "Computer networks and the internet",
+  "grade_level": "A/L",
+  "main_topic": "Networking fundamentals",
+  "scope": "Network types, hardware (NIC, router, switch), IP addressing basics, client-server model, common protocols (HTTP, DNS) at a conceptual level",
+  "learning_objectives": {
+    "LO1": {
+      "objective": "Compare LAN, WAN, and WLAN and give examples of where each is used",
+      "cognitive_level": "Understand",
+      "question_types": ["short_answer", "conceptual"]
+    },
+    "LO2": {
+      "objective": "Describe the roles of common network devices such as NIC, switch, router, and access point",
+      "cognitive_level": "Remember",
+      "question_types": ["short_answer", "explanatory"]
+    },
+    "LO3": {
+      "objective": "Explain the client-server model and how a web browser requests a page using HTTP and DNS",
+      "cognitive_level": "Understand",
+      "question_types": ["explanatory"]
+    }
+  }
+}

@@ -50,4 +50,6 @@ def get_content(lesson_id: str, lo_id: str):
     except HTTPException:
         raise
     except Exception as e:
+        if "quota" in str(e).lower() or "429" in str(e):
+            raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

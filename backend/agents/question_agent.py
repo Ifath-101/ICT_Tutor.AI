@@ -10,48 +10,55 @@ from services.llm_service import client, MODEL_NAME
 
 
 def generate_question(lesson_id: str, db: Session, user_id: int):
-    blueprint = load_blueprint(lesson_id)
+    try:
+        blueprint = load_blueprint(lesson_id)
 
-    lo_ids = list(blueprint["learning_objectives"].keys())
-    lo_id = get_adaptive_lo(db, user_id, lesson_id, lo_ids)
-    lo = blueprint["learning_objectives"][lo_id]
+        lo_ids = list(blueprint["learning_objectives"].keys())
+        lo_id = get_adaptive_lo(db, user_id, lesson_id, lo_ids)
+        lo = blueprint["learning_objectives"][lo_id]
 
-    mastery = get_lo_mastery(db, user_id, lesson_id, lo_id)
+        mastery = get_lo_mastery(db, user_id, lesson_id, lo_id)
 
-    if mastery < 0.4:
-        difficulty = "easy"
-    elif mastery < 0.7:
-        difficulty = "moderate"
-    else:
-        difficulty = "application-level"
+        if mastery < 0.4:
+            difficulty = "easy"
+        elif mastery < 0.7:
+            difficulty = "moderate"
+        else:
+            difficulty = "application-level"
 
-    prompt = f"""
-    You are an AI tutor.
+        prompt = f"""
+        You are an AI tutor.
 
-    Generate EXACTLY ONE {difficulty} question.
+        Generate EXACTLY ONE {difficulty} question.
 
-    IMPORTANT RULES:
-    - Generate ONLY ONE question.
-    - Do NOT combine multiple questions.
-    - Question must test ONLY this objective:
-      {lo["objective"]}
-    - Stay strictly within this scope:
-      {blueprint["scope"]}
+        IMPORTANT RULES:
+        - Generate ONLY ONE question.
+        - Do NOT combine multiple questions.
+        - Question must test ONLY this objective:
+          {lo["objective"]}
+        - Stay strictly within this scope:
+          {blueprint["scope"]}
 
-    Return ONLY valid JSON:
-    {{
-        "learning_objective": "{lo_id}",
-        "question": "One clear question only.",
-        "correct_answer": "Clear model answer."
-    }}
-    """
+        Return ONLY valid JSON:
+        {{
+            "learning_objective": "{lo_id}",
+            "question": "One clear question only.",
+            "correct_answer": "Clear model answer."
+        }}
+        """
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt
-    )
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt
+        )
 
-    raw_text = response.text.strip()
-    cleaned = re.sub(r"```json|```", "", raw_text).strip()
+        raw_text = response.text.strip()
+        cleaned = re.sub(r"```json|```", "", raw_text).strip()
 
-    return json.loads(cleaned)
+        return json.loads(cleaned)
+    except HTTPException:
+        raise
+    except Exception as e:
+        if "quota" in str(e).lower() or "429" in str(e):
+            raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
