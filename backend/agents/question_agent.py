@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from agents.progress_agent import get_adaptive_lo, get_lo_mastery
 from lessons.catalog import load_blueprint
 from services.llm_service import client, MODEL_NAME
+from services.rag_service import retrieve_context
 
 
 def generate_question(lesson_id: str, db: Session, user_id: int):
@@ -25,18 +26,23 @@ def generate_question(lesson_id: str, db: Session, user_id: int):
             difficulty = "moderate"
         else:
             difficulty = "application-level"
+            
+        context = retrieve_context(lesson_id, lo.get("objective"))
 
         prompt = f"""
         You are an AI tutor.
 
         Generate EXACTLY ONE {difficulty} question.
+        
+        Source Material Context (Formulate your question base strictly on facts from this provided context):
+        {context if context else "(No textbook material available, rely on basic facts within scope)"}
 
         IMPORTANT RULES:
         - Generate ONLY ONE question.
         - Do NOT combine multiple questions.
         - Question must test ONLY this objective:
           {lo["objective"]}
-        - Stay strictly within this scope:
+        - Stay strictly within this scope and use the Source Material provided:
           {blueprint["scope"]}
 
         Return ONLY valid JSON:

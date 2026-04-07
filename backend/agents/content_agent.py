@@ -1,5 +1,6 @@
 from lessons.catalog import load_blueprint
 from services.llm_service import client, MODEL_NAME
+from services.rag_service import retrieve_context
 from fastapi import HTTPException
 
 
@@ -13,6 +14,9 @@ def get_content(lesson_id: str, lo_id: str):
             raise HTTPException(status_code=404, detail="Learning Objective not found")
 
         lo = learning_objectives[lo_id]
+        
+        # Retrieve context from vector db
+        context = retrieve_context(lesson_id, lo.get("objective"))
 
         # Build prompt
         prompt = f"""
@@ -24,12 +28,15 @@ def get_content(lesson_id: str, lo_id: str):
 
         Learning Objective:
         {lo.get("objective")}
+        
+        Source Material Context (Use ONLY facts from this material to explain the concept):
+        {context if context else "(No specific textbook material available, rely on general knowledge within scope)"}
 
         Generate structured lesson content:
         - Clear explanation
-        - Simple language for Grade 8
+        - Simple language for Grade {blueprint.get("grade_level", 8)}
         - Include examples
-        - Stay within scope
+        - Stay within scope and EXCLUSIVELY use the Source Material provided above.
         - 200-300 words
         """
 
