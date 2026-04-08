@@ -10,6 +10,8 @@ function QuestionView({ lesson: lessonProp }) {
   const [question, setQuestion] = useState(null);
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState(null);
+  const [hint, setHint] = useState(null);
+  const [isHintLoading, setIsHintLoading] = useState(false);
 
   const fetchQuestion = useCallback(() => {
     if (!lesson) return;
@@ -19,6 +21,7 @@ function QuestionView({ lesson: lessonProp }) {
         setQuestion(res.data);
         setAnswer("");
         setResult(null);
+        setHint(null);
       })
       .catch((err) => console.error(err));
   }, [lesson]);
@@ -44,6 +47,21 @@ function QuestionView({ lesson: lessonProp }) {
       .catch((err) => console.error(err));
   };
 
+  const fetchHint = () => {
+    if (!question) return;
+    setIsHintLoading(true);
+    api
+      .post(`/lesson/${lesson}/hint`, {
+        question: question.question,
+        correct_answer: question.correct_answer,
+      })
+      .then((res) => {
+        setHint(res.data.hint);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsHintLoading(false));
+  };
+
   if (!lesson) {
     return <div className="loading">Missing lesson.</div>;
   }
@@ -65,9 +83,20 @@ function QuestionView({ lesson: lessonProp }) {
         placeholder="Type your answer..."
       />
 
-      <button type="button" className="submit-btn" onClick={submitAnswer}>
-        Submit Answer
-      </button>
+      <div className="action-buttons" style={{ display: "flex", gap: "10px" }}>
+        <button type="button" className="submit-btn" onClick={submitAnswer}>
+          Submit Answer
+        </button>
+        <button type="button" className="hint-btn" onClick={fetchHint} disabled={isHintLoading} style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid #cbd5e1", cursor: "pointer", background: "white" }}>
+          {isHintLoading ? "Loading Hint..." : "Get Hint"}
+        </button>
+      </div>
+
+      {hint && (
+        <div className="socratic-hint">
+          <p><strong>💡 Hint:</strong> {hint}</p>
+        </div>
+      )}
 
       {result && (
         <div className="result-box">
@@ -88,7 +117,7 @@ function QuestionView({ lesson: lessonProp }) {
             <strong>Improvements:</strong> {result.improvements}
           </p>
 
-          <button type="button" className="next-btn" onClick={fetchQuestion}>
+          <button type="button" className="next-btn" onClick={fetchQuestion} style={{ marginTop: "15px" }}>
             Next Question
           </button>
         </div>

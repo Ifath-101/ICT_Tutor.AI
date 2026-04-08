@@ -20,7 +20,7 @@ def process_answer(
     return {
         "score": score,
         "updated_mastery": new_mastery,
-        "explanation": result["explanation"],
-        "strengths": result["strengths"],
-        "improvements": result["improvements"]
+        "explanation": result.get("explanation", ""),
+        "strengths": result.get("strengths", ""),
+        "improvements": result.get("improvements", "")
     }

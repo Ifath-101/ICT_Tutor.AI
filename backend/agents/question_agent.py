@@ -68,3 +68,26 @@ def generate_question(lesson_id: str, db: Session, user_id: int):
         if "quota" in str(e).lower() or "429" in str(e):
             raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+def generate_hint(question: str, correct_answer: str):
+    try:
+        prompt = f"""
+        You are an AI tutor helping a student with a question.
+
+        Question: {question}
+        Correct Answer: {correct_answer}
+
+        Provide a short, helpful hint to guide the student towards the correct answer without directly revealing it.
+        Return plain text, no markdown.
+        """
+
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt
+        )
+
+        return response.text.strip()
+    except Exception as e:
+        if "quota" in str(e).lower() or "429" in str(e):
+            raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

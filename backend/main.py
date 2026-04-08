@@ -9,7 +9,7 @@ from database.database import engine, get_db
 from database.models import User
 from routes.auth_routes import router as auth_router
 from agents.content_agent import get_content
-from agents.question_agent import generate_question
+from agents.question_agent import generate_question, generate_hint
 from agents.submission_agent import process_answer
 from lessons.catalog import list_lessons, load_blueprint
 from routes.progress_routes import router as progress_router
@@ -45,6 +45,10 @@ class AnswerPayload(BaseModel):
     answer: str
     correct_answer: str
 
+class HintPayload(BaseModel):
+    question: str
+    correct_answer: str
+
 
 @app.get("/lesson/{lesson_id}/blueprint")
 def get_blueprint(
@@ -70,6 +74,15 @@ def next_question(
     current_user: User = Depends(get_current_user),
 ):
     return generate_question(lesson_id, db, current_user.id)
+
+
+@app.post("/lesson/{lesson_id}/hint")
+def get_hint(
+    lesson_id: str,
+    payload: HintPayload,
+    current_user: User = Depends(get_current_user),
+):
+    return {"hint": generate_hint(payload.question, payload.correct_answer)}
 
 
 @app.post("/lesson/{lesson_id}/answer")
