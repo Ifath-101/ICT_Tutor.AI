@@ -1,7 +1,10 @@
-from services.llm_service import client, MODEL_NAME
+from services.llm_service import generate_text
 from fastapi import HTTPException
 import json
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def assess_answer(student_answer, correct_answer):
@@ -30,12 +33,7 @@ def assess_answer(student_answer, correct_answer):
         - Return ONLY valid JSON.
         """
 
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt
-        )
-
-        raw_text = response.text.strip()
+        raw_text = generate_text(prompt).strip()
         cleaned = re.sub(r"```json|```", "", raw_text).strip()
 
         try:
@@ -50,6 +48,7 @@ def assess_answer(student_answer, correct_answer):
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error in assess_answer: {e}", exc_info=True)
         if "quota" in str(e).lower() or "429" in str(e):
             raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

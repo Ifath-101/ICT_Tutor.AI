@@ -52,24 +52,38 @@ function ContentView({ lesson, subtopic, onStartTest }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    let ignore = false;
+    const controller = new AbortController();
+
     setLoading(true);
     setError(false);
 
     api
-      .get(`/lesson/${lesson}/content/${subtopic}`)
-      .then((res) => {
-        setContent(res.data.content ?? "");
-        setMeta({
-          lesson_title: res.data.lesson_title ?? "",
-          learning_objective: res.data.learning_objective ?? "",
-          learning_objective_id: res.data.learning_objective_id ?? subtopic,
-        });
-        setLoading(false);
+      .get(`/lesson/${lesson}/content/${subtopic}`, {
+        signal: controller.signal,
       })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
+      .then((res) => {
+        if (!ignore) {
+          setContent(res.data.content ?? "");
+          setMeta({
+            lesson_title: res.data.lesson_title ?? "",
+            learning_objective: res.data.learning_objective ?? "",
+            learning_objective_id: res.data.learning_objective_id ?? subtopic,
+          });
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          setError(true);
+          setLoading(false);
+        }
       });
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
   }, [lesson, subtopic]);
 
   return (

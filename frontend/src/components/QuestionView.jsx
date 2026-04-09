@@ -13,23 +13,32 @@ function QuestionView({ lesson: lessonProp }) {
   const [hint, setHint] = useState(null);
   const [isHintLoading, setIsHintLoading] = useState(false);
 
-  const fetchQuestion = useCallback(() => {
+  const fetchQuestion = useCallback((signal) => {
     if (!lesson) return;
     api
-      .get(`/lesson/${lesson}/next-question`)
+      .get(`/lesson/${lesson}/next-question`, { signal })
       .then((res) => {
         setQuestion(res.data);
         setAnswer("");
         setResult(null);
         setHint(null);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        if (err.name !== "CanceledError") {
+          console.error(err);
+        }
+      });
   }, [lesson]);
 
   useEffect(() => {
+    const controller = new AbortController();
     setQuestion(null);
     setResult(null);
-    fetchQuestion();
+    fetchQuestion(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [lesson, fetchQuestion]);
 
   const submitAnswer = () => {

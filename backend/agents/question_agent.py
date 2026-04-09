@@ -1,12 +1,16 @@
 import json
 import re
+import logging
 
 from fastapi import HTTPException
+
+logger = logging.getLogger(__name__)
+
 from sqlalchemy.orm import Session
 
 from agents.progress_agent import get_adaptive_lo, get_lo_mastery
 from lessons.catalog import load_blueprint
-from services.llm_service import client, MODEL_NAME
+from services.llm_service import generate_text
 from services.rag_service import retrieve_context
 
 
@@ -38,6 +42,7 @@ def generate_question(lesson_id: str, db: Session, user_id: int):
         {context if context else "(No textbook material available, rely on basic facts within scope)"}
 
         IMPORTANT RULES:
+        - The context is provided only for you to create the question. So do not firectly refer to it in questions.
         - Generate ONLY ONE question.
         - Do NOT combine multiple questions.
         - Question must test ONLY this objective:
@@ -53,18 +58,14 @@ def generate_question(lesson_id: str, db: Session, user_id: int):
         }}
         """
 
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt
-        )
-
-        raw_text = response.text.strip()
+        raw_text = generate_text(prompt).strip()
         cleaned = re.sub(r"```json|```", "", raw_text).strip()
 
         return json.loads(cleaned)
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error in generate_question: {e}", exc_info=True)
         if "quota" in str(e).lower() or "429" in str(e):
             raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -81,13 +82,9 @@ def generate_hint(question: str, correct_answer: str):
         Return plain text, no markdown.
         """
 
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt
-        )
-
-        return response.text.strip()
+        return generate_text(prompt).strip()
     except Exception as e:
+        logger.error(f"Error in generate_hint: {e}", exc_info=True)
         if "quota" in str(e).lower() or "429" in str(e):
             raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

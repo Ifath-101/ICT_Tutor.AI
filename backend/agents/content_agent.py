@@ -1,7 +1,10 @@
 from lessons.catalog import load_blueprint
-from services.llm_service import client, MODEL_NAME
+from services.llm_service import generate_text
 from services.rag_service import retrieve_context
 from fastapi import HTTPException
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_content(lesson_id: str, lo_id: str):
@@ -41,22 +44,20 @@ def get_content(lesson_id: str, lo_id: str):
         """
 
         # Generate content
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt
-        )
+        content_text = generate_text(prompt)
 
         return {
             "lesson_id": lesson_id,
             "lesson_title": blueprint.get("title"),
             "learning_objective_id": lo_id,
             "learning_objective": lo.get("objective"),
-            "content": response.text
+            "content": content_text
         }
 
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error in get_content: {e}", exc_info=True)
         if "quota" in str(e).lower() or "429" in str(e):
             raise HTTPException(status_code=429, detail=f"LLM API Quota Exceeded: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
