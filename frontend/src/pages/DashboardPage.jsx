@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { PageHeader } from "../components/PageHeader";
 import "./DashboardPage.css";
@@ -6,6 +7,40 @@ import "./DashboardPage.css";
 function labelKey(p) {
   return `${p.lesson_id}:${p.lo_id}`;
 }
+
+const CircularProgress = ({ percentage, color = "#6366f1", size = 80, strokeWidth = 8 }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
+  
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="circular-progress">
+      <circle
+        stroke="#e2e8f0"
+        fill="transparent"
+        strokeWidth={strokeWidth}
+        r={radius}
+        cx={size/2}
+        cy={size/2}
+      />
+      <circle
+        stroke={color}
+        fill="transparent"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={`${circumference} ${circumference}`}
+        style={{ strokeDashoffset: offset, transition: 'stroke-dashoffset 1.5s ease-out' }}
+        r={radius}
+        cx={size/2}
+        cy={size/2}
+        transform={`rotate(-90 ${size/2} ${size/2})`}
+      />
+      <text x="50%" y="50%" dy=".3em" textAnchor="middle" fontSize={size * 0.25} fontWeight="800" fill="#1e293b">
+        {Math.round(percentage)}%
+      </text>
+    </svg>
+  );
+};
 
 function DashboardPage() {
   const [progress, setProgress] = useState([]);
@@ -85,11 +120,22 @@ function DashboardPage() {
     };
   }, [progress]);
 
+  const groupedProgress = useMemo(() => {
+    return progress.reduce((acc, p) => {
+      const title = lessonTitles[p.lesson_id] || p.lesson_id;
+      if (!acc[title]) {
+        acc[title] = [];
+      }
+      acc[title].push(p);
+      return acc;
+    }, {});
+  }, [progress, lessonTitles]);
+
   return (
     <div className="dashboard">
       <PageHeader
-        title="Your dashboard"
-        subtitle="Mastery and practice stats are saved per account. Use this view to see where you are improving and what to study next."
+        title="Your Dashboard"
+        subtitle="Track your mastery across all lessons. See where you excel and what needs more focus."
       />
 
       {loading && (
@@ -101,125 +147,140 @@ function DashboardPage() {
 
       {!loading && !error && (
         <>
-          <div className="dashboard-summary">
-            <div className="dashboard-stat">
-              <span className="dashboard-stat__value">
-                {stats.totalAttempts}
-              </span>
-              <span className="dashboard-stat__label">Total attempts</span>
+          <div className="dashboard-summary-cards">
+            <div className="dashboard-card stat-card">
+              <div className="stat-card__content">
+                <span className="stat-card__label">Average Mastery</span>
+                <p className="stat-card__subtext">Across all topics studied</p>
+              </div>
+              <CircularProgress percentage={stats.avgMastery * 100} size={84} color="#4f46e5" strokeWidth={8} />
             </div>
-            <div className="dashboard-stat">
-              <span className="dashboard-stat__value">
-                {(stats.avgMastery * 100).toFixed(0)}%
-              </span>
-              <span className="dashboard-stat__label">Avg. mastery</span>
+            
+            <div className="dashboard-card stat-card">
+              <div className="stat-card__content">
+                <span className="stat-card__label">Objectives Tracked</span>
+                <span className="stat-card__value">{stats.topicsTracked}</span>
+                <p className="stat-card__subtext">Learning goals initiated</p>
+              </div>
+              <div className="stat-card__icon bg-indigo-100 text-indigo-600">📚</div>
             </div>
-            <div className="dashboard-stat">
-              <span className="dashboard-stat__value">
-                {stats.topicsTracked}
-              </span>
-              <span className="dashboard-stat__label">Objectives tracked</span>
+
+            <div className="dashboard-card stat-card">
+              <div className="stat-card__content">
+                <span className="stat-card__label">Total Attempts</span>
+                <span className="stat-card__value">{stats.totalAttempts}</span>
+                <p className="stat-card__subtext">Questions answered</p>
+              </div>
+              <div className="stat-card__icon bg-emerald-100 text-emerald-600">💯</div>
             </div>
           </div>
 
-          {stats.weakest && stats.weakest.mastery < 0.85 && (
-            <div className="dashboard-insight dashboard-insight--focus">
-              <h2 className="dashboard-insight__title">Focus next</h2>
-              <p>
-                Your adaptive sessions will prioritize weaker objectives. Right
-                now,{" "}
-                <strong>
-                  {lessonTitles[stats.weakest.lesson_id] ||
-                    stats.weakest.lesson_id}{" "}
-                  · {stats.weakest.lo_id}
-                </strong>{" "}
-                has the lowest mastery (
-                {(stats.weakest.mastery * 100).toFixed(0)}%). Review it under{" "}
-                <strong>Learn</strong> or practice in <strong>Assessments</strong>
-                .
-              </p>
-            </div>
-          )}
+          <div className="dashboard-insights-grid">
+            {stats.weakest && stats.weakest.mastery < 0.85 && (
+              <div className="dashboard-card insight-card insight-card--focus">
+                <div className="insight-card__header">
+                  <span className="insight-card__icon">📈</span>
+                  <h2 className="insight-card__title">Focus Next</h2>
+                </div>
+                <div className="insight-card__body">
+                  <h3 className="insight-card__topic">
+                    {lessonTitles[stats.weakest.lesson_id] || stats.weakest.lesson_id} · {stats.weakest.lo_id}
+                  </h3>
+                  <p className="insight-card__desc">
+                    Current mastery is at {(stats.weakest.mastery * 100).toFixed(0)}%. 
+                    Jumping into a quick assessment session will help reinforce this.
+                  </p>
+                  <Link to={`/learn/${stats.weakest.lesson_id}`} className="insight-card__cta insight-card__cta--focus">
+                    Review Lesson
+                  </Link>
+                </div>
+              </div>
+            )}
 
-          {stats.strongest && stats.strongest.mastery >= 0.5 && (
-            <div className="dashboard-insight dashboard-insight--positive">
-              <h2 className="dashboard-insight__title">Strong area</h2>
-              <p>
-                <strong>
-                  {lessonTitles[stats.strongest.lesson_id] ||
-                    stats.strongest.lesson_id}{" "}
-                  · {stats.strongest.lo_id}
-                </strong>{" "}
-                is among your highest mastery at{" "}
-                {(stats.strongest.mastery * 100).toFixed(0)}% — keep reinforcing
-                with mixed practice.
-              </p>
-            </div>
-          )}
+            {stats.strongest && stats.strongest.mastery >= 0.5 && (
+              <div className="dashboard-card insight-card insight-card--strong">
+                <div className="insight-card__header">
+                  <span className="insight-card__icon">⭐</span>
+                  <h2 className="insight-card__title">Strongest Area</h2>
+                </div>
+                <div className="insight-card__body">
+                  <h3 className="insight-card__topic">
+                    {lessonTitles[stats.strongest.lesson_id] || stats.strongest.lesson_id} · {stats.strongest.lo_id}
+                  </h3>
+                  <p className="insight-card__desc">
+                    You're doing great here with {(stats.strongest.mastery * 100).toFixed(0)}% mastery. 
+                    Keep it up!
+                  </p>
+                  <Link to={`/assessments/${stats.strongest.lesson_id}`} className="insight-card__cta insight-card__cta--strong">
+                    Test Yourself
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
 
-          <h2 className="dashboard-section-heading">Performance by objective</h2>
+          <h2 className="dashboard-section-heading">Detailed Progress by Lesson</h2>
           {progress.length === 0 ? (
-            <p className="dashboard-empty">
-              No attempts yet. Complete an assessment to see per-topic mastery
-              and improvement here.
-            </p>
+            <div className="dashboard-empty-state">
+              <div className="empty-state-icon">🚀</div>
+              <h3>No progress yet</h3>
+              <p>Complete an assessment to see your mastery breakdown here.</p>
+              <Link to="/learn" className="empty-state-btn">Start Learning</Link>
+            </div>
           ) : (
-            <ul className="dashboard-rows">
-              {progress
-                .slice()
-                .sort((a, b) => a.mastery - b.mastery)
-                .map((p) => {
-                  const pct = Math.round(p.mastery * 100);
-                  const objLabel = loLabels[labelKey(p)] ?? p.lo_id;
-                  const accuracy =
-                    p.attempts > 0
-                      ? Math.round((p.correct / p.attempts) * 100)
-                      : 0;
-                  const lessonTitle =
-                    lessonTitles[p.lesson_id] || p.lesson_id;
-                  return (
-                    <li
-                      key={`${p.lesson_id}-${p.lo_id}`}
-                      className="dashboard-row"
-                    >
-                      <p className="dashboard-row__lesson">{lessonTitle}</p>
-                      <div className="dashboard-row__head">
-                        <span className="dashboard-row__id">{p.lo_id}</span>
-                        <span className="dashboard-row__pct">{pct}%</span>
-                      </div>
-                      <p className="dashboard-row__objective">{objLabel}</p>
-                      <div
-                        className="dashboard-row__bar"
-                        role="presentation"
-                      >
-                        <span
-                          className="dashboard-row__fill"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <div className="dashboard-row__meta">
-                        <span>
-                          Attempts: <strong>{p.attempts}</strong>
-                        </span>
-                        <span>
-                          Scores ≥ threshold: <strong>{p.correct}</strong>
-                        </span>
-                        <span>
-                          Session accuracy: <strong>{accuracy}%</strong>
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-            </ul>
+            <div className="lesson-groups">
+              {Object.entries(groupedProgress).map(([lessonTitle, items]) => (
+                <div key={lessonTitle} className="lesson-group">
+                  <h3 className="lesson-group__title">{lessonTitle}</h3>
+                  <div className="lesson-group__grid">
+                    {items
+                      .sort((a, b) => b.mastery - a.mastery)
+                      .map((p) => {
+                        const pct = Math.round(p.mastery * 100);
+                        const objLabel = loLabels[labelKey(p)] ?? p.lo_id;
+                        const accuracy = p.attempts > 0 ? Math.round((p.correct / p.attempts) * 100) : 0;
+                        
+                        return (
+                          <div key={`${p.lesson_id}-${p.lo_id}`} className="objective-card">
+                            <div className="objective-card__header">
+                              <span className="objective-card__id">{p.lo_id}</span>
+                              <span className="objective-card__pct">{pct}%</span>
+                            </div>
+                            <p className="objective-card__name">{objLabel}</p>
+                            
+                            <div className="objective-card__progress-container">
+                              <div className="objective-card__progress-bg">
+                                <div 
+                                  className={`objective-card__progress-fill ${pct >= 85 ? 'fill-excellent' : pct >= 50 ? 'fill-good' : 'fill-needs-work'}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="objective-card__stats">
+                              <div className="obj-stat">
+                                <span className="obj-stat__lbl">Questions</span>
+                                <span className="obj-stat__val">{p.attempts}</span>
+                              </div>
+                              <div className="obj-stat">
+                                <span className="obj-stat__lbl">Accuracy</span>
+                                <span className="obj-stat__val">{accuracy}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
 
-          <p className="dashboard-footnote">
-            Mastery uses a reinforcement-style update from each graded answer
-            (weighted with your history). It is not the same as a single exam
-            score—use it to track how the system estimates your understanding
-            over time.
-          </p>
+          <div className="dashboard-footer-note">
+            <p>
+              <strong>How mastery works:</strong> Mastery uses a reinforcement-style update from each graded answer, weighted by your history. Use it to track how the system estimates your understanding over time.
+            </p>
+          </div>
         </>
       )}
     </div>
