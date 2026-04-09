@@ -92,7 +92,11 @@ function DashboardPage() {
         subtitle="Mastery and practice stats are saved per account. Use this view to see where you are improving and what to study next."
       />
 
-      {loading && <p className="dashboard-loading">Loading your data…</p>}
+      {loading && (
+        <div className="loading-container">
+          <div className="loading-spinner" aria-hidden="true" />
+        </div>
+      )}
       {error && <p className="dashboard-error">{error}</p>}
 
       {!loading && !error && (

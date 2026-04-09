@@ -10,7 +10,7 @@ function LearnSubtopicsPage() {
     <div>
       <PageHeader
         title="Learning objectives"
-        subtitle="Study each subtopic in order, or jump ahead—content is generated for the objective you pick."
+        subtitle="Study each subtopic in order, or jump ahead—content is tailored for the objective you pick."
         backTo="/learn"
       />
       <SubtopicList

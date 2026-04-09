@@ -72,10 +72,18 @@ function QuestionView({ lesson: lessonProp }) {
   };
 
   if (!lesson) {
-    return <div className="loading">Missing lesson.</div>;
+    return (
+      <div className="loading-container">
+        Missing lesson.
+      </div>
+    );
   }
 
-  if (!question) return <div className="loading">Loading question...</div>;
+  if (!question) return (
+    <div className="loading-container">
+      <div className="loading-spinner" aria-hidden="true" />
+    </div>
+  );
 
   return (
     <div className="question-card">
@@ -97,7 +105,7 @@ function QuestionView({ lesson: lessonProp }) {
           Submit Answer
         </button>
         <button type="button" className="hint-btn" onClick={fetchHint} disabled={isHintLoading} style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid #cbd5e1", cursor: "pointer", background: "white" }}>
-          {isHintLoading ? "Loading Hint..." : "Get Hint"}
+          {isHintLoading ? "Getting Hint..." : "Get Hint"}
         </button>
       </div>
 

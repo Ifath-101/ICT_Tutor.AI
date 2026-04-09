@@ -46,11 +46,8 @@ function SubtopicList({
   if (loading) {
     return (
       <div className="subtopic-page">
-        <div className="subtopic-loading">
-          <span className="subtopic-loading__dot" />
-          <span className="subtopic-loading__dot" />
-          <span className="subtopic-loading__dot" />
-          <p>Loading lesson outline…</p>
+        <div className="loading-container">
+          <div className="loading-spinner" aria-hidden="true" />
         </div>
       </div>
     );
@@ -91,7 +88,7 @@ function SubtopicList({
           </h2>
           <p className="subtopic-section__hint">
             {showStudy
-              ? "Open a topic to generate personalized study content, then assess when you are ready."
+              ? "Open a topic to get personalized study content, then assess when you are ready."
               : "Choose where to begin."}
           </p>
         </div>

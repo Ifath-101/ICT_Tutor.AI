@@ -100,8 +100,7 @@ function ContentView({ lesson, subtopic, onStartTest }) {
       <div className="content-panel">
         {loading && (
           <div className="content-loading">
-            <div className="content-loading__spinner" aria-hidden />
-            <p>Generating your lesson…</p>
+            <div className="content-loading__spinner" aria-hidden="true" />
           </div>
         )}
 

@@ -107,7 +107,7 @@ function HomePage() {
             </div>
             <h3 className="home-feature__title">Structured lessons</h3>
             <p className="home-feature__text">
-              Follow learning objectives with AI-generated explanations, worked
+              Follow learning objectives with personalized explanations, worked
               examples, and scope aligned to core ICT topics.
             </p>
           </li>

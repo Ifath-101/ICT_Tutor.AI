@@ -31,7 +31,9 @@ function LessonList({ onSelectLesson }) {
   if (loading) {
     return (
       <div className="lesson-card">
-        <p className="lesson-loading">Loading lessons…</p>
+        <div className="loading-container">
+          <div className="loading-spinner" aria-hidden="true" />
+        </div>
       </div>
     );
   }
