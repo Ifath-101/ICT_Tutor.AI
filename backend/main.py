@@ -14,6 +14,7 @@ from agents.submission_agent import process_answer
 from lessons.catalog import list_lessons, load_blueprint
 from routes.progress_routes import router as progress_router
 from routes.tutor_routes import router as tutor_router
+from routes.chat_routes import router as chat_router
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -21,6 +22,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(progress_router)
 app.include_router(tutor_router)
+app.include_router(chat_router)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ChatBot from "./ChatBot";
 import "./MainLayout.css";
 
 function MainLayout() {
@@ -133,6 +134,8 @@ function MainLayout() {
       <footer className="shell-footer">
         <p>ICT Tutor AI — adaptive practice aligned to your curriculum.</p>
       </footer>
+      
+      {user && <ChatBot />}
     </div>
   );
 }

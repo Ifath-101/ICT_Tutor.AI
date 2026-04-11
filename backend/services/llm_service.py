@@ -25,6 +25,15 @@ def generate_text(prompt: str) -> str:
     return response.choices[0].message.content
 
 
+def generate_chat_response(messages: list[dict]) -> str:
+    """Generates a response from a multi-turn conversation."""
+    response = client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=messages
+    )
+    return response.choices[0].message.content
+
+
 def semantic_similarity(student_answer, correct_answer):
     prompt = f"""
     Compare the student's answer with the correct answer.
