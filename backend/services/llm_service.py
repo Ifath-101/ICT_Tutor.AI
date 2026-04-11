@@ -13,7 +13,7 @@ client = OpenAI(
 )
 
 # You can change the model name in your .env file
-MODEL_NAME = os.getenv("OPEN_ROUTER_MODEL", "qwen/qwen-plus")
+MODEL_NAME = os.getenv("OPEN_ROUTER_MODEL", "openrouter/free")
 
 
 def generate_text(prompt: str) -> str:

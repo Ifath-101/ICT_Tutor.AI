@@ -1,46 +1,64 @@
 import json
-from lessons.catalog import list_lessons, load_blueprint
+from lessons.catalog import load_blueprint
 from services.llm_service import generate_chat_response
+from services.rag_service import find_global_context
 
-def get_syllabus_context() -> str:
-    """Loads all available lesson blueprints and formats them as a string context."""
-    lessons = list_lessons()
-    context_lines = ["Available ICT Syllabus Context:"]
+def format_blueprint(blueprint: dict) -> str:
+    """Formats a single blueprint into a string context."""
+    lines = []
+    lines.append(f"Title: {blueprint.get('title')}")
+    lines.append(f"Main Topic: {blueprint.get('main_topic')}")
+    lines.append(f"Scope: {blueprint.get('scope')}")
     
-    for lesson in lessons:
-        lid = lesson["lesson_id"]
-        try:
-            blueprint = load_blueprint(lid)
-            # Summarize blueprint to save tokens and maintain focus
-            context_lines.append(f"\nLesson ID: {lid}")
-            context_lines.append(f"Title: {blueprint.get('title')}")
-            context_lines.append(f"Main Topic: {blueprint.get('main_topic')}")
-            context_lines.append(f"Scope: {blueprint.get('scope')}")
-            
-            los = blueprint.get('learning_objectives', {})
-            for lo_id, lo_data in los.items():
-                context_lines.append(f" - {lo_id}: {lo_data.get('objective')}")
-        except Exception:
-            pass
-
-    return "\n".join(context_lines)
+    los = blueprint.get('learning_objectives', {})
+    if los:
+        lines.append("Learning Objectives:")
+        for lo_id, lo_data in los.items():
+            lines.append(f" - {lo_id}: {lo_data.get('objective')}")
+    return "\n".join(lines)
 
 
 def process_chat(message_history: list[dict]) -> str:
     """
-    Processes the chat history, injects system prompts constraining the AI
-    to the syllabus, and returns the AI's string response.
+    Processes the chat history, uses vector search to identify the likely topic,
+    loads the specific lesson blueprint and textbook chunks, and returns the AI's response.
     """
-    syllabus_context = get_syllabus_context()
+    # 1. Identify the user's latest active query
+    # Find the last message from the user
+    user_query = "What are you learning today?"
+    for msg in reversed(message_history):
+        if msg.get("role") == "user":
+            user_query = msg.get("content")
+            break
+            
+    # 2. Semantic search against the ICT syllabus database
+    rag_result = find_global_context(user_query, n_results=2)
+    
+    # 3. Decision routing
+    DISTANCE_THRESHOLD = 1.6 # Chroma distances > 1.6 usually mean low semantic match for all-MiniLM-L6-v2
+    
+    dynamic_context = ""
+    
+    if rag_result["distance"] < DISTANCE_THRESHOLD and rag_result["lesson_id"]:
+        lid = rag_result["lesson_id"]
+        try:
+            blueprint = load_blueprint(lid)
+            bp_str = format_blueprint(blueprint)
+            dynamic_context = f"\nRelevant Lesson Blueprint:\n{bp_str}\n\nRelevant Textbook Excerpts (Use to answer questions):\n{rag_result['context']}"
+        except Exception:
+            # If blueprint is missing, just use the RAG context
+            dynamic_context = f"\nRelevant Textbook Excerpts (Use to answer questions):\n{rag_result['context']}"
+    else:
+        # Generic context when off-topic or greeting
+        dynamic_context = "\nNote: The user request is either a greeting or outside the current database. If outside, gently redirect them to ICT subjects."
 
     system_prompt = f"""You are a helpful and strict AI ICT Tutor.
 Your goal is to help students learn ICT concepts by chatting with them.
-You must STRICTLY adhere to the lesson blueprints provided below. 
+You must STRICTLY adhere to the provided lesson blueprint and excerpts below. 
 Do not answer questions or discuss topics outside of this syllabus scope. 
 If a student asks something unrelated or outside the scope, politely redirect them back to the syllabus topics.
 When answering, be conversational, engaging, pedagogical, and encouraging. Ask follow-up questions to test their understanding when appropriate.
-
-{syllabus_context}
+{dynamic_context}
 """
 
     messages = [{"role": "system", "content": system_prompt}]

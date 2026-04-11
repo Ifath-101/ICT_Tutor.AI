@@ -86,3 +86,38 @@ def retrieve_context(lesson_id: str, query: str, n_results: int = 3) -> str:
     except Exception as e:
         print(f"Error retrieving context: {e}")
         return ""
+
+
+def find_global_context(query: str, n_results: int = 2) -> dict:
+    """
+    Searches the entire syllabus collection without a lesson filter.
+    Returns the top retrieved text, distance scores, and the most likely lesson_id.
+    """
+    try:
+        results = collection.query(
+            query_texts=[query],
+            n_results=n_results
+        )
+        
+        if not results["documents"] or len(results["documents"][0]) == 0:
+            return {"context": "", "lesson_id": None, "distance": 999.0}
+            
+        top_lesson = None
+        top_distance = 999.0
+        
+        if results["metadatas"] and len(results["metadatas"][0]) > 0:
+            top_lesson = results["metadatas"][0][0].get("lesson_id")
+        
+        if results["distances"] and len(results["distances"][0]) > 0:
+            top_distance = results["distances"][0][0]
+            
+        context_text = "\n\n".join(results["documents"][0])
+        
+        return {
+            "context": context_text,
+            "lesson_id": top_lesson,
+            "distance": top_distance
+        }
+    except Exception as e:
+        print(f"Error finding global context: {e}")
+        return {"context": "", "lesson_id": None, "distance": 999.0}
