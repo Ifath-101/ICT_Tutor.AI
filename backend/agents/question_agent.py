@@ -43,8 +43,7 @@ def generate_question(lesson_id: str, db: Session, user_id: int):
 
         IMPORTANT RULES:
         - The context is provided only for you to create the question. So do not firectly refer to it in questions.
-        - Generate ONLY ONE question.
-        - Do NOT combine multiple questions.
+        - Generate ONLY ONE question and do not combine more that one question
         - Question must test ONLY this objective:
           {lo["objective"]}
         - Stay strictly within this scope and use the Source Material provided:
