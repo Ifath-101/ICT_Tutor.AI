@@ -8,6 +8,7 @@ function LoginForm({ variant }) {
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +26,7 @@ function LoginForm({ variant }) {
       if (variant === "login") {
         await login(email.trim(), password);
       } else {
-        await register(email.trim(), password);
+        await register(name.trim(), email.trim(), password);
       }
       navigate(from, { replace: true });
     } catch (err) {
@@ -50,6 +51,19 @@ function LoginForm({ variant }) {
       </p>
 
       <form onSubmit={submit} className="auth-form">
+        {variant === "register" && (
+          <label className="auth-label">
+            Name
+            <input
+              type="text"
+              className="auth-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoComplete="name"
+            />
+          </label>
+        )}
         <label className="auth-label">
           Email
           <input

@@ -11,6 +11,7 @@ router = APIRouter()
 
 
 class AuthBody(BaseModel):
+    name: str | None = None
     email: str
     password: str
 
@@ -24,6 +25,7 @@ def register(body: AuthBody, db: Session = Depends(get_db)):
     hashed_pw = hash_password(body.password)
 
     new_user = User(
+        name=body.name,
         email=body.email,
         password_hash=hashed_pw
     )
@@ -56,5 +58,6 @@ def login(body: AuthBody, db: Session = Depends(get_db)):
 def get_me(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
+        "name": current_user.name,
         "email": current_user.email
     }

@@ -55,7 +55,7 @@ function MainLayout() {
           {user && (
             <div className="shell-user shell-user--desktop">
               <span className="shell-user__email" title={user.email}>
-                {user.email}
+                {user.name || user.email}
               </span>
               <button type="button" className="shell-logout" onClick={logout}>
                 Log out
@@ -89,7 +89,7 @@ function MainLayout() {
 
           {user && menuOpen && (
             <div className="shell-user shell-user--mobile">
-              <span className="shell-user__email">{user.email}</span>
+              <span className="shell-user__email">{user.name || user.email}</span>
               <button
                 type="button"
                 className="shell-logout"
