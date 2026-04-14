@@ -43,8 +43,8 @@ def home():
 
 
 @app.get("/lessons")
-def get_lessons():
-    return list_lessons()
+def get_lessons(db: Session = Depends(get_db)):
+    return list_lessons(db)
 
 
 class AnswerPayload(BaseModel):
@@ -60,18 +60,20 @@ class HintPayload(BaseModel):
 @app.get("/lesson/{lesson_id}/blueprint")
 def get_blueprint(
     lesson_id: str,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return load_blueprint(lesson_id)
+    return load_blueprint(lesson_id, db)
 
 
 @app.get("/lesson/{lesson_id}/content/{lo_id}")
 def content(
     lesson_id: str,
     lo_id: str,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return get_content(lesson_id, lo_id)
+    return get_content(lesson_id, lo_id, db)
 
 
 @app.get("/lesson/{lesson_id}/next-question")

@@ -16,7 +16,7 @@ from services.rag_service import retrieve_context
 
 def generate_question(lesson_id: str, db: Session, user_id: int):
     try:
-        blueprint = load_blueprint(lesson_id)
+        blueprint = load_blueprint(lesson_id, db)
 
         lo_ids = list(blueprint["learning_objectives"].keys())
         lo_id = get_adaptive_lo(db, user_id, lesson_id, lo_ids)

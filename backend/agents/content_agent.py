@@ -2,14 +2,15 @@ from lessons.catalog import load_blueprint
 from services.llm_service import generate_text
 from services.rag_service import retrieve_context
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def get_content(lesson_id: str, lo_id: str):
+def get_content(lesson_id: str, lo_id: str, db: Session):
     try:
-        blueprint = load_blueprint(lesson_id)
+        blueprint = load_blueprint(lesson_id, db)
 
         # Validate LO existence
         learning_objectives = blueprint.get("learning_objectives", {})

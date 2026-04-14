@@ -2,6 +2,7 @@ import json
 from lessons.catalog import load_blueprint
 from services.llm_service import generate_chat_response
 from services.rag_service import find_global_context
+from sqlalchemy.orm import Session
 
 def format_blueprint(blueprint: dict) -> str:
     """Formats a single blueprint into a string context."""
@@ -18,7 +19,7 @@ def format_blueprint(blueprint: dict) -> str:
     return "\n".join(lines)
 
 
-def process_chat(message_history: list[dict]) -> str:
+def process_chat(message_history: list[dict], db: Session) -> str:
     """
     Processes the chat history, uses vector search to identify the likely topic,
     loads the specific lesson blueprint and textbook chunks, and returns the AI's response.
@@ -42,7 +43,7 @@ def process_chat(message_history: list[dict]) -> str:
     if rag_result["distance"] < DISTANCE_THRESHOLD and rag_result["lesson_id"]:
         lid = rag_result["lesson_id"]
         try:
-            blueprint = load_blueprint(lid)
+            blueprint = load_blueprint(lid, db)
             bp_str = format_blueprint(blueprint)
             dynamic_context = f"\nRelevant Lesson Blueprint:\n{bp_str}\n\nRelevant Textbook Excerpts (Use to answer questions):\n{rag_result['context']}"
         except Exception:
