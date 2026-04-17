@@ -24,14 +24,22 @@ app.include_router(progress_router)
 app.include_router(tutor_router)
 app.include_router(chat_router)
 
+import os
+
+# Get allowed origins from environment variable, fallback to localhost for dev
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+if FRONTEND_URL not in ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS.append(FRONTEND_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174"
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
