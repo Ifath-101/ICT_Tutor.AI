@@ -28,7 +28,7 @@ import os
 
 # Get allowed origins from environment variable, fallback to localhost for dev
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-ALLOWED_ORIGINS = ["https://ict-tutor-ai.vercel.app/"]
+ALLOWED_ORIGINS = ["https://ict-tutor-ai.vercel.app"]
 if FRONTEND_URL not in ALLOWED_ORIGINS:
     ALLOWED_ORIGINS.append(FRONTEND_URL)
 
