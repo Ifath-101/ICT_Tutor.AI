@@ -4,3 +4,5 @@ pydantic
 chromadb
 pypdf
 google-genai
+bcrypt==4.0.1
+passlib[bcrypt]
